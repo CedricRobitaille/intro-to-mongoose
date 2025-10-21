@@ -23,11 +23,12 @@ const disconnect = async () => {
 const rootOverview = () => {
   console.log(`What would you like to do?`);
   console.log(`
-    1. Create a cutsomer
+    1. Create a customer
     2. View all customers
     3. Update a customer
     4. Delete a customer
     5. Quit`)
+    console.log("")
 }
 
 
@@ -48,23 +49,23 @@ const rootInput = () => {
 const createInput = async () => {
   console.log("Creating a new Customer...")
 
-  console.log("Input the customer's name:")
+  console.log("\nInput the customer's name:")
   const customerName = prompt("> ");
 
-  console.log("Input the customer's age:")
+  console.log("\nInput the customer's age:")
   const customerAge = prompt("> ");
 
 
-  console.log("Creating customer...")
-  const createCustomer = await Customer.create({
+  console.log("\nCreating customer...")
+  const createdCustomer = await Customer.create({
     name: customerName,
     age: customerAge,
   });
   console.clear();
 
   console.log("You have created the following customer:")
-  console.log(createCustomer);
-  console.log("Press any key to continue.")
+  console.log(`  ID: ${createdCustomer._id}, Name: ${createdCustomer.name}, Age: ${createdCustomer.age}`)
+  console.log("\nPress any key to continue.")
   prompt("> ");
   inputRouting("root");
 }
@@ -74,10 +75,13 @@ const readInput = async () => {
   const customers = await Customer.find({})
   console.clear();
 
-  console.log("Below is a list of customers:")
-  console.log(customers)
+  console.log("Below is a list of customers:\n")
+  customers.forEach((customer) => {
+    console.log(`   Name: ${customer.name}, Age: ${customer.age} --  ID: ${customer._id},`)
+  })
+  
 
-  prompt("Press any key to continue\n> ")
+  prompt("\nPress any key to continue\n> ")
   inputRouting("root");
 }
 
@@ -94,7 +98,6 @@ const updateInput = async () => {
   })
 
   const customerById = async () => {
-    console.log();
     console.log("\nSelect the `Index` of the customer you'd like to update:")
     const customerIndex = prompt("> ");
     return customers[parseInt(customerIndex)]
@@ -141,8 +144,6 @@ const updateInput = async () => {
   inputRouting("root")
 }
 
-
-
 const deleteInput = async () => {
   console.log("Loading Customers...")
   const customers = await Customer.find({})
@@ -161,12 +162,14 @@ const deleteInput = async () => {
   }
 
   const customerData = await customerById();
+  console.clear();
   console.log("You are attempting to delete the user:")
   console.log(`  ID: ${customerData._id}, Name: ${customerData.name}, Age: ${customerData.age}\n`);
 
   const confirmation = () => {
-    let input = prompt("(Yes / No)")
-    if (input != "Yes" || input != "No") {
+    let input = prompt("(Yes / No) ")
+    console.log(input)
+    if (input != "Yes" && input != "No") {
       console.log("\nInvalid Response...")
       input = confirmation()
     }
@@ -176,13 +179,16 @@ const deleteInput = async () => {
   const confirmationInput = confirmation();
 
   if (confirmationInput === "Yes") {
+    console.log("Deleting Customer Data...")
     const deletedCustomer = await Customer.findByIdAndDelete(customerData.id);
+    console.clear();
     console.log("You have deleted the following customer information:")
     console.log(`  Name: ${deletedCustomer.name}, Age: ${deletedCustomer.age}\n`);
-    console.log("\nTo return to selection, press any key:")
+    console.log("\nTo return Home, press any key:")
     prompt("> ")
-    deleteInput();
+    inputRouting("root");
   } else {
+    console.clear();
     console.log("We will not remove this customer from the database.")
     console.log("\nTo return to selection, press any key:")
     prompt("> ")
@@ -195,7 +201,7 @@ const inputRouting = (state) => {
   let input = state;
   console.clear();
   if (input != "root") {
-    if (input < "1" && input > "5") {
+    if (parseInt(input) < 1 && parseInt(input) > "5") {
       console.log("THIS")
       input = "root"
     }
